@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>SecureAuth | Sistema de Autenticación Empresarial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- RESET & BASE MONOCROMÁTICO ---------- */
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Escala completa de grises — profesional, corporativo */
+      --gray-0:    #FFFFFF;
+      --gray-50:   #F9F9FB;
+      --gray-100:  #F0F0F2;
+      --gray-200:  #E4E4E7;
+      --gray-300:  #CFCFD4;
+      --gray-400:  #A1A1AA;
+      --gray-500:  #71717A;
+      --gray-600:  #52525B;
+      --gray-700:  #3F3F46;
+      --gray-800:  #27272A;
+      --gray-850:  #1F1F23;
+      --gray-900:  #18181B;
+      --black:     #0A0A0C;
+
+      --surface-sidebar: var(--gray-850);
+      --surface-card:    var(--gray-0);
+      --border-subtle:   var(--gray-200);
+      --border-medium:   var(--gray-300);
+      --text-primary:    var(--gray-900);
+      --text-secondary:  var(--gray-600);
+      --text-inverse:    var(--gray-100);
+      --accent-solid:    var(--gray-800);
+      --accent-hover:    var(--black);
+      --focus-ring:      rgba(0, 0, 0, 0.25);
+      --error-bg:        #F7F7F8;
+      --error-border:    var(--gray-400);
+      --error-text:      var(--gray-900);
+    }
+
+    body {
+      background: var(--gray-50);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 400;
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    /* contenedor principal — formal, limpio, sin ornamentos */
+    .auth-container {
+      width: 100%;
+      max-width: 1080px;
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      background: var(--surface-card);
+      border-radius: 20px;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
+      overflow: hidden;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* ========= PANEL LATERAL IZQUIERDO — ELEGANTE / OSCURO ========= */
+    .sidebar-panel {
+      background: var(--surface-sidebar);
+      padding: 2rem 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      border-right: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 1.25rem;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--gray-700);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray-100);
+    }
+
+    .brand-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 1.3rem;
+      letter-spacing: -0.3px;
+      color: var(--gray-0);
+    }
+
+    .brand-badge {
+      font-size: 0.6rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(255, 255, 255, 0.08);
+      display: inline-block;
+      padding: 0.2rem 0.65rem;
+      border-radius: 20px;
+      color: var(--gray-300);
+      margin-top: 0.3rem;
+      width: fit-content;
+    }
+
+    /* características de seguridad */
+    .security-features {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .feature-card {
+      display: flex;
+      gap: 0.85rem;
+      padding: 0.75rem 0.9rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .feature-card:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .feature-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+      color: var(--gray-400);
+    }
+
+    .feature-content h4 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--gray-200);
+      margin-bottom: 0.2rem;
+    }
+
+    .feature-content p {
+      font-size: 0.7rem;
+      line-height: 1.4;
+      color: var(--gray-400);
+    }
+
+    /* CWE badges — monocromáticos con distintos pesos visuales */
+    .cwe-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .cwe-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      padding: 0.2rem 0.65rem;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--gray-300);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+      font-weight: 500;
+    }
+
+    /* ========= PANEL FORMULARIO ========= */
+    .form-panel {
+      background: var(--surface-card);
+      padding: 2rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    .form-header h2 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
+      color: var(--gray-900);
+      margin-bottom: 0.3rem;
+    }
+
+    .form-header p {
+      font-size: 0.8rem;
+      color: var(--gray-500);
+      border-left: 2px solid var(--gray-300);
+      padding-left: 0.7rem;
+    }
+
+    /* alertas monocromáticas formales */
+    .alert {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 450;
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      color: var(--gray-800);
+    }
+
+    .alert-error {
+      background: #FCFCFC;
+      border-left: 3px solid var(--gray-700);
+      color: var(--gray-900);
+    }
+
+    .alert-warning {
+      background: #FCFCFC;
+      border-left: 3px solid var(--gray-600);
+    }
+
+    .alert-info {
+      background: #FCFCFC;
+      border-left: 3px solid var(--gray-500);
+    }
+
+    .alert-icon {
+      font-size: 1rem;
+      opacity: 0.7;
+    }
+
+    /* fields formales */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .input-group label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--gray-600);
+    }
+
+    .input-group input {
+      font-family: 'JetBrains Mono', 'Inter', monospace;
+      background: var(--gray-0);
+      border: 1px solid var(--gray-200);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      font-size: 0.85rem;
+      color: var(--gray-900);
+      transition: 0.2s;
+      outline: none;
+      width: 100%;
+    }
+
+    .input-group input:focus {
+      border-color: var(--gray-700);
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .totp-flex {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .totp-flex input {
+      flex: 1;
+      text-align: center;
+      letter-spacing: 0.2rem;
+      font-size: 1rem;
+    }
+
+    .small-hint {
+      font-size: 0.65rem;
+      color: var(--gray-500);
+      margin-top: 0.25rem;
+    }
+
+    .link-ghost {
+      color: var(--gray-800);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--gray-400);
+      font-weight: 500;
+    }
+
+    /* botón principal */
+    .btn-primary {
+      background: var(--gray-900);
+      border: none;
+      width: 100%;
+      padding: 0.85rem;
+      border-radius: 40px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 0.01em;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.2rem;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.02);
+    }
+
+    .btn-primary:hover {
+      background: var(--black);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+    }
+
+    /* demo users (formal) */
+    .demo-section {
+      background: var(--gray-50);
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+      border: 1px solid var(--gray-200);
+    }
+
+    .demo-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--gray-600);
+      margin-bottom: 0.7rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .demo-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.75rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .demo-row:last-child {
+      border-bottom: none;
+    }
+
+    .demo-user {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 500;
+      color: var(--gray-800);
+    }
+
+    .demo-pass {
+      font-family: monospace;
+      color: var(--gray-500);
+      font-size: 0.68rem;
+    }
+
+    .demo-fill {
+      background: none;
+      border: none;
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--gray-700);
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      border-radius: 30px;
+      transition: all 0.1s;
+    }
+
+    .demo-fill:hover {
+      background: var(--gray-200);
+      color: var(--gray-900);
+    }
+
+    /* barra de intentos */
+    .attempt-track {
+      background: var(--gray-200);
+      height: 3px;
+      border-radius: 4px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .attempt-progress {
+      height: 100%;
+      width: 0%;
+      background: var(--gray-800);
+      transition: width 0.25s ease;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid var(--gray-200);
+      margin: 0.25rem 0;
+    }
+
+    /* responsive */
+    @media (max-width: 780px) {
+      .auth-container {
+        grid-template-columns: 1fr;
+        max-width: 550px;
+      }
+      .sidebar-panel {
+        display: none; /* en movil se oculta el sidebar para priorizar formulario */
+      }
+      .form-panel {
+        padding: 1.75rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 1rem;
+      }
+      .form-panel {
+        padding: 1.25rem;
+      }
+      .btn-primary {
+        padding: 0.7rem;
+      }
+    }
+
+    /* Utilidades extra para texto monospace en campos */
+    .mono-placeholder::placeholder {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-container">
+  <!-- panel lateral izquierdo: información de seguridad corporativa -->
+  <div class="sidebar-panel">
+    <div>
+      <div class="brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-text">SecureAuth</div>
+          <div class="brand-badge">OWASP A07:2025 · Demo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="security-features">
+      <div class="feature-card">
+        <div class="feature-content">
+          <h4>Rate limiting + Lockout</h4>
+          <p>Ventana deslizante 60s · bloqueo progresivo IP/usuario tras 5 fallos.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-content">
+          <h4>MFA obligatorio (TOTP)</h4>
+          <p>CWE-308 · segundo factor dinámico invalida credential stuffing.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-content">
+          <h4>bcrypt + pwd hashing</h4>
+          <p>Rounds=12 · sin texto plano ni algoritmos obsoletos.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-content">
+          <h4>Anti-enumeración (CWE-287)</h4>
+          <p>Mensajes genéricos + delay aleatorio anti-timing attacks.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-content">
+          <h4>Session Fixation prevención</h4>
+          <p>ID regenerado tras login · expiración automática.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="cwe-stack">
+        <span class="cwe-tag">CWE-287</span>
+        <span class="cwe-tag">CWE-307</span>
+        <span class="cwe-tag">CWE-308</span>
+        <span class="cwe-tag">CWE-384</span>
+        <span class="cwe-tag">CWE-521</span>
+        <span class="cwe-tag">CWE-613</span>
+        <span class="cwe-tag">CWE-1392</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- panel formulario de autenticación -->
+  <div class="form-panel">
+    <div class="form-header">
+      <h2>Inicio de sesión</h2>
+      <p>Acceso seguro · cumplimiento OWASP Top 10:2025</p>
+    </div>
+
+    <!-- Mensajes dinámicos (Jinja2) -->
+    {% if error %}
+    <div class="alert alert-error">
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    {% if warn %}
+    <div class="alert alert-warning">
+      <span>{{ warn }}</span>
+    </div>
+    {% endif %}
+
+    {% if locked %}
+    <div class="alert alert-warning">
+      <span>Cuenta bloqueada temporalmente. Espera <strong>{{ wait }}s</strong> (protección anti-brute force)</span>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="/login" autocomplete="off" id="loginForm">
+      <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+        <div class="input-group">
+          <label for="username">Usuario / Identificador</label>
+          <input type="text" id="username" name="username"
+                 placeholder="Ingresa tu usuario"
+                 value="{{ username_hint or '' }}"
+                 autocomplete="off" spellcheck="false"
+                 maxlength="64" required>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="password"
+                 placeholder="················"
+                 autocomplete="current-password"
+                 maxlength="128" required>
+        </div>
+
+        <div class="input-group">
+          <label for="totp">Código TOTP (Autenticador MFA)</label>
+          <div class="totp-flex">
+            <input type="text" id="totp" name="totp"
+                   placeholder="000000"
+                   maxlength="6" inputmode="numeric"
+                   pattern="[0-9]{6}"
+                   autocomplete="one-time-code">
+          </div>
+          <div class="small-hint">
+            <a href="#" id="fetchTotp" class="link-ghost">Obtener código TOTP demo automático</a>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-primary">Verificar credenciales →</button>
+      </div>
+    </form>
+
+    <!-- Panel de usuarios demo -->
+    <div class="demo-section">
+      <div class="demo-title">
+        Credenciales de demostración
+      </div>
+      <div class="demo-row">
+        <span class="demo-user">admin</span>
+        <span class="demo-pass">S3cur3P@ss!2025</span>
+        <button class="demo-fill" onclick="fillUser('admin','S3cur3P@ss!2025')">Usar</button>
+      </div>
+      <div class="demo-row">
+        <span class="demo-user">alice</span>
+        <span class="demo-pass">AliceRocks#99</span>
+        <button class="demo-fill" onclick="fillUser('alice','AliceRocks#99')">Usar</button>
+      </div>
+      <div class="demo-row">
+        <span class="demo-user">bob</span>
+        <span class="demo-pass">B0bIsH3re$2025</span>
+        <button class="demo-fill" onclick="fillUser('bob','B0bIsH3re$2025')">Usar</button>
+      </div>
+      <hr>
+      <div class="small-hint" style="margin-top: 8px; text-align: left;">
+        MFA obligatorio: el TOTP se obtendrá automáticamente al usar demo.
+      </div>
+    </div>
+
+    <!-- tiny barra de intentos (visual feedback) opcional, se puede conectar con backend pero es estática demostrativa -->
+    <div class="attempt-track">
+      <div class="attempt-progress" id="attemptProgressBar" style="width: 0%;"></div>
+    </div>
+    <div class="small-hint" style="margin-top: -0.2rem; text-align: right;">
+      Intentos fallidos: <span id="attemptCountSpan">0</span> / 5
+    </div>
+  </div>
+</div>
+
+<script>
+  // funciones helper TOTP y control tentativas (simulación frontend)
+  let attemptClientCount = 0;
+  const maxAttempts = 5;
+
+  function updateAttemptUI() {
+    const percent = (attemptClientCount / maxAttempts) * 100;
+    const progressEl = document.getElementById('attemptProgressBar');
+    const countSpan = document.getElementById('attemptCountSpan');
+    if (progressEl) progressEl.style.width = `${Math.min(percent, 100)}%`;
+    if (countSpan) countSpan.innerText = attemptClientCount;
+    if (attemptClientCount >= maxAttempts) {
+      // indicador visual de bloqueo simulado (backend ya maneja el lockout real)
+      const btn = document.querySelector('.btn-primary');
+      if (btn) btn.style.opacity = '0.6';
+    } else {
+      const btn = document.querySelector('.btn-primary');
+      if (btn) btn.style.opacity = '1';
+    }
+  }
+
+  // Incrementar intentos locales al enviar formulario (solo feedback visual)
+  function incrementAttempts() {
+    attemptClientCount++;
+    updateAttemptUI();
+    // reseteamos el contador de intentos después de bloqueo simulado (el backend es quien realmente controla)
+    if (attemptClientCount >= maxAttempts) {
+      setTimeout(() => {
+        // no reseteamos automáticamente para no confundir. El backend da mensaje de locked.
+      }, 100);
+    }
+  }
+
+  // reset intentos (se puede llamar tras login exitoso)
+  window.resetAttempts = function() {
+    attemptClientCount = 0;
+    updateAttemptUI();
+  };
+
+  // escucha el submit para aumentar contador visual antes del envío real (solo si no está bloqueado backend)
+  const loginForm = document.getElementById('loginForm');
+  if (loginForm) {
+    loginForm.addEventListener('submit', function(e) {
+      // no evitamos submit, solo sumamos intento para UX formal
+      // pero solo si el campo username y password no están vacíos (evitar sumar vacíos)
+      const user = document.getElementById('username')?.value;
+      const pwd = document.getElementById('password')?.value;
+      if (user && pwd) {
+        incrementAttempts();
+      }
+    });
+  }
+
+  function fillUser(user, pass) {
+    document.getElementById('username').value = user;
+    document.getElementById('password').value = pass;
+    fetchTotpCode(user);
+    // Opcional: resetear contador visual de intentos cuando se rellena un demo nuevo
+    // (solo por claridad)
+    attemptClientCount = 0;
+    updateAttemptUI();
+    const btn = document.querySelector('.btn-primary');
+    if (btn) btn.style.opacity = '1';
+  }
+
+  async function fetchTotpCode(user) {
+    let username = user || document.getElementById('username')?.value;
+    if (!username) {
+      // alert sutil sin romper formalidad
+      const smallHint = document.querySelector('.small-hint a');
+      if(smallHint) smallHint.style.color = 'var(--gray-600)';
+      return;
+    }
+    try {
+      const response = await fetch(`/api/demo_totp/${encodeURIComponent(username)}`);
+      const data = await response.json();
+      if (data && data.code) {
+        const totpField = document.getElementById('totp');
+        if (totpField) {
+          totpField.value = data.code;
+          totpField.style.borderColor = 'var(--gray-500)';
+          setTimeout(() => { totpField.style.borderColor = ''; }, 2000);
+        }
+      } else {
+        // fallback silencioso
+      }
+    } catch (err) {
+      console.warn("TOTP fetch error (demo backend requerido)");
+    }
+  }
+
+  document.getElementById('fetchTotp')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    const user = document.getElementById('username')?.value;
+    if (!user) {
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-warning';
+      alertDiv.innerHTML = '<span>Ingresa un usuario antes de obtener TOTP</span>';
+      const refNode = document.querySelector('.form-header');
+      if(refNode && !document.querySelector('.tmp-notice')) {
+        alertDiv.classList.add('tmp-notice');
+        refNode.insertAdjacentElement('afterend', alertDiv);
+        setTimeout(() => alertDiv.remove(), 2500);
+      }
+      return;
+    }
+    fetchTotpCode(user);
+  });
+
+  // refresco automático opcional de TOTP cada 28s si hay usuario y campo
+  setInterval(() => {
+    const usernameField = document.getElementById('username')?.value;
+    const totpField = document.getElementById('totp');
+    if (usernameField && totpField && totpField.value.length > 0) {
+      fetchTotpCode(usernameField);
+    } else if (usernameField && totpField && !totpField.value) {
+      // si está vacío pero hay usuario puede ser útil
+      fetchTotpCode(usernameField);
+    }
+  }, 28000);
+</script>
+</body>
+</html>

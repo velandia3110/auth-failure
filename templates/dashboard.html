@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureAuth — Panel de monitoreo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ---------- RESET Y VARIABLES MONOCROMÁTICAS ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* Escala completa de grises — estilo corporativo */
+      --gray-0:    #FFFFFF;
+      --gray-50:   #F8F9FA;
+      --gray-100:  #F0F2F4;
+      --gray-200:  #E2E4E8;
+      --gray-300:  #CACED4;
+      --gray-400:  #A8ADB7;
+      --gray-500:  #868C98;
+      --gray-600:  #5F6570;
+      --gray-700:  #40454E;
+      --gray-800:  #2C3038;
+      --gray-850:  #1E2128;
+      --gray-900:  #121317;
+      --black:     #0A0B0E;
+
+      /* Fondo y superficies */
+      --bg-base:      var(--gray-50);
+      --surface-top:  var(--gray-0);
+      --surface-card: var(--gray-0);
+      --surface-side: var(--gray-850);
+      --border-light: var(--gray-200);
+      --border-med:   var(--gray-300);
+      --text-primary: var(--gray-900);
+      --text-secondary: var(--gray-600);
+      --text-inverse: var(--gray-100);
+      --accent-solid: var(--gray-800);
+      --accent-hover: var(--gray-900);
+      --focus-ring:   rgba(0, 0, 0, 0.12);
+      
+      /* Estados (tonos de gris diferenciados, sin color) */
+      --status-success: var(--gray-700);
+      --status-failure: var(--gray-800);
+      --status-blocked: var(--gray-600);
+      --status-info:    var(--gray-500);
+    }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    /* Barra superior */
+    .topbar {
+      background: var(--surface-top);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0.9rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      color: var(--gray-900);
+    }
+    .brand small {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--gray-500);
+      font-family: 'JetBrains Mono', monospace;
+      margin-left: 0.5rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 0.8rem;
+    }
+    .user-badge {
+      background: var(--gray-100);
+      border: 1px solid var(--border-light);
+      border-radius: 40px;
+      padding: 0.3rem 1rem;
+      color: var(--gray-800);
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+    }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--gray-400);
+      border-radius: 40px;
+      padding: 0.4rem 1rem;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--gray-800);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-logout:hover {
+      background: var(--gray-100);
+      border-color: var(--gray-700);
+    }
+
+    /* Contenido principal */
+    .main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* Banner de éxito (sin emojis) */
+    .success-banner {
+      background: var(--gray-0);
+      border: 1px solid var(--gray-200);
+      border-radius: 1rem;
+      padding: 1.25rem 1.75rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+    .banner-icon {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--gray-700);
+      background: var(--gray-100);
+      width: 2.2rem;
+      height: 2.2rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 60px;
+    }
+    .banner-title {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--gray-900);
+    }
+    .banner-sub {
+      font-size: 0.75rem;
+      color: var(--gray-600);
+      margin-top: 0.2rem;
+    }
+
+    /* Tarjetas de estadísticas */
+    .grid-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border-light);
+      border-radius: 1rem;
+      padding: 1.2rem 1rem;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover {
+      border-color: var(--gray-400);
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      color: var(--gray-500);
+      margin-bottom: 0.5rem;
+    }
+    .stat-value {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--gray-900);
+    }
+
+    /* Secciones genéricas */
+    .section-title {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--gray-600);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--gray-200);
+    }
+
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .panel {
+      background: var(--surface-card);
+      border: 1px solid var(--border-light);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      overflow: hidden;
+    }
+
+    /* Log de eventos */
+    .event-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+    .event-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .event-list::-webkit-scrollbar-track {
+      background: var(--gray-100);
+    }
+    .event-list::-webkit-scrollbar-thumb {
+      background: var(--gray-400);
+      border-radius: 10px;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      border-left: 3px solid;
+      background: var(--gray-0);
+      box-shadow: 0 1px 1px rgba(0,0,0,0.02);
+    }
+    .event-item.success {
+      border-left-color: var(--gray-700);
+      background: var(--gray-50);
+    }
+    .event-item.failure {
+      border-left-color: var(--gray-800);
+      background: var(--gray-50);
+    }
+    .event-item.blocked {
+      border-left-color: var(--gray-600);
+      background: var(--gray-50);
+    }
+    .event-item.info {
+      border-left-color: var(--gray-500);
+      background: var(--gray-50);
+    }
+    .event-type {
+      font-weight: 600;
+      min-width: 130px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+    }
+    .event-user {
+      color: var(--gray-800);
+      font-weight: 500;
+    }
+    .event-ip {
+      color: var(--gray-500);
+      font-size: 0.7rem;
+    }
+    .event-time {
+      margin-left: auto;
+      color: var(--gray-500);
+      font-size: 0.65rem;
+      font-family: monospace;
+    }
+
+    /* Grid de controles OWASP */
+    .owasp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.8rem;
+    }
+    .owasp-item {
+      background: var(--gray-50);
+      padding: 0.8rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--gray-200);
+    }
+    .owasp-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 4px;
+    }
+    .owasp-cwe {
+      font-size: 0.6rem;
+      color: var(--gray-600);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 0.5rem;
+    }
+    .owasp-bar {
+      height: 4px;
+      background: var(--gray-200);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .owasp-fill {
+      height: 100%;
+      width: 100%;
+      background: var(--gray-800);
+      border-radius: 4px;
+    }
+    .owasp-status {
+      font-size: 0.65rem;
+      margin-top: 0.5rem;
+      color: var(--gray-700);
+      font-weight: 500;
+    }
+
+    /* Panel de pruebas de seguridad */
+    .test-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .test-card {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: 0.8rem;
+      padding: 1rem;
+      transition: all 0.1s ease;
+    }
+    .test-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin-bottom: 0.3rem;
+      letter-spacing: -0.2px;
+    }
+    .test-desc {
+      font-size: 0.7rem;
+      color: var(--gray-600);
+      line-height: 1.4;
+      margin-bottom: 0.8rem;
+    }
+    .test-cmd {
+      background: var(--gray-900);
+      color: var(--gray-200);
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* Responsive */
+    @media (max-width: 780px) {
+      .two-columns {
+        grid-template-columns: 1fr;
+      }
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .main {
+        padding: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    Secure<span style="font-weight: 400;">Auth</span>
+    <small>OWASP A07:2025 · Dashboard</small>
+  </div>
+  <div class="user-info">
+    <span class="user-badge">{{ username | default('admin') }}</span>
+    <form method="POST" action="/logout" style="display: inline;">
+      <button type="submit" class="btn-logout">Cerrar sesión</button>
+    </form>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Banner de éxito (sin emojis) -->
+  <div class="success-banner">
+    <div class="banner-icon">✓</div>
+    <div>
+      <div class="banner-title">Autenticación exitosa</div>
+      <div class="banner-sub">MFA verificado · Sesión regenerada · Último acceso: {{ last_login or 'primera vez' }}</div>
+    </div>
+  </div>
+
+  <!-- Estadísticas -->
+  <div class="grid-stats">
+    <div class="stat-card">
+      <div class="stat-label">IPs bloqueadas</div>
+      <div class="stat-value" id="statBlockedIps">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Usuarios bloqueados</div>
+      <div class="stat-value" id="statLockedUsers">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Fallos recientes</div>
+      <div class="stat-value" id="statFailures">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Logins exitosos</div>
+      <div class="stat-value" id="statSuccesses">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total eventos</div>
+      <div class="stat-value" id="statTotal">—</div>
+    </div>
+  </div>
+
+  <!-- Sección: monitoreo + OWASP -->
+  <div class="section-title">Monitoreo y telemetría</div>
+  <div class="two-columns">
+    <!-- Log eventos -->
+    <div class="panel">
+      <div class="section-title" style="margin-bottom: 1rem;">Registro de eventos</div>
+      <div class="event-list" id="eventList">
+        {% for e in events %}
+        <div class="event-item {{ 'success' if 'SUCCESS' in e.event else ('blocked' if 'LIMIT' in e.event or 'LOCKOUT' in e.event else 'failure') }}">
+          <span class="event-type">{{ e.event }}</span>
+          <span class="event-user">{{ e.username }}</span>
+          <span class="event-ip">{{ e.ip }}</span>
+          <span class="event-time">{{ e.timestamp[11:19] if e.timestamp else '' }}</span>
+        </div>
+        {% else %}
+        <div style="color:var(--gray-500); padding:0.8rem; text-align:center;">Sin eventos recientes</div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Controles OWASP activos -->
+    <div class="panel">
+      <div class="section-title" style="margin-bottom: 1rem;">Controles de seguridad activos</div>
+      <div class="owasp-grid">
+        <div class="owasp-item">
+          <div class="owasp-name">Rate limiting</div>
+          <div class="owasp-cwe">CWE-307 · 10 req/min/IP</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
+          <div class="owasp-status">Activo</div>
+        </div>
+        <div class="owasp-item">
+          <div class="owasp-name">TOTP (MFA)</div>
+          <div class="owasp-cwe">CWE-308 · RFC 6238</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
+          <div class="owasp-status">Activo</div>
+        </div>
+        <div class="owasp-item">
+          <div class="owasp-name">bcrypt hashing</div>
+          <div class="owasp-cwe">A04 · rounds=12</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
+          <div class="owasp-status">Activo</div>
+        </div>
+        <div class="owasp-item">
+          <div class="owasp-name">Anti-enumeración</div>
+          <div class="owasp-cwe">CWE-287 · msg genérico</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
+          <div class="owasp-status">Activo</div>
+        </div>
+        <div class="owasp-item">
+          <div class="owasp-name">Session Fixation</div>
+          <div class="owasp-cwe">CWE-384 · regeneración</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
+          <div class="owasp-status">Activo</div>
+        </div>
+        <div class="owasp-item">
+          <div class="owasp-name">Session Timeout</div>
+          <div class="owasp-cwe">CWE-613 · 15 min idle</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
+          <div class="owasp-status">Activo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pruebas de seguridad - comandos demostrativos (sin emojis) -->
+  <div class="section-title">Pruebas de seguridad · comandos de ejemplo</div>
+  <div class="panel" style="margin-bottom: 1rem;">
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-title">Fuerza bruta / diccionario</div>
+        <div class="test-desc">Ataque de contraseñas. Bloqueado tras 5 fallos por usuario + 10 por IP en 60s.</div>
+        <div class="test-cmd">for pass in $(cat rockyou.txt); do
+  curl -s -X POST http://localhost:5000/login \
+    -d "username=admin&password=$pass&totp=000000"
+  sleep 0.1
+done</div>
+      </div>
+      <div class="test-card">
+        <div class="test-title">Credential stuffing</div>
+        <div class="test-desc">Lista de credenciales robadas. Aunque la contraseña sea correcta, el TOTP bloquea.</div>
+        <div class="test-cmd">while IFS=: read u p; do
+  curl -s -X POST http://localhost:5000/login \
+    -d "username=$u&password=$p&totp=000000" \
+    -w "\n%{http_code}\n"
+done &lt; leaked_creds.txt</div>
+      </div>
+      <div class="test-card">
+        <div class="test-title">Password spray</div>
+        <div class="test-desc">Una misma contraseña probada contra múltiples usuarios. Detección por IP.</div>
+        <div class="test-cmd">for user in admin alice bob carlos; do
+  curl -s -X POST http://localhost:5000/login \
+    -d "username=$user&password=Winter2025&totp=000000" \
+    -o /dev/null -w "$user: %{http_code}\n"
+done</div>
+      </div>
+      <div class="test-card">
+        <div class="test-title">Enumeración de usuarios</div>
+        <div class="test-desc">Intentar diferenciar usuarios válidos. La respuesta es idéntica siempre.</div>
+        <div class="test-cmd">for user in admin alice bob fake ghost; do
+  curl -s -X POST http://localhost:5000/login \
+    -d "username=$user&password=x&totp=000000" \
+    | grep -o "incorrecto\|bloqueado"
+done</div>
+      </div>
+      <div class="test-card">
+        <div class="test-title">Timing attack</div>
+        <div class="test-desc">Medir diferencial de tiempo entre usuarios reales y falsos (delay aleatorio).</div>
+        <div class="test-cmd">for user in admin fakeusr999; do
+  time curl -s -X POST http://localhost:5000/login \
+    -d "username=$user&password=test&totp=000000" &gt; /dev/null
+done</div>
+      </div>
+      <div class="test-card">
+        <div class="test-title">API de estado y monitoreo</div>
+        <div class="test-desc">Consultar métricas, IPs bloqueadas, usuarios en lockout y eventos.</div>
+        <div class="test-cmd">curl http://localhost:5000/api/status | python3 -m json.tool
+# TOTP demo
+curl http://localhost:5000/api/demo_totp/admin</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Función para refrescar estadísticas y eventos desde la API interna
+  async function refreshDashboard() {
+    try {
+      const response = await fetch('/api/status');
+      const data = await response.json();
+
+      // Actualizar estadísticas
+      const blockedIps = Object.values(data.active_ips || {}).filter(v => v >= 5).length;
+      const lockedUsers = Object.keys(data.locked_users || {}).length;
+      const recentFailures = data.recent_failures || 0;
+      const recentSuccesses = data.recent_successes || 0;
+      const totalEvents = data.total_events || 0;
+
+      document.getElementById('statBlockedIps').innerText = blockedIps;
+      document.getElementById('statLockedUsers').innerText = lockedUsers;
+      document.getElementById('statFailures').innerText = recentFailures;
+      document.getElementById('statSuccesses').innerText = recentSuccesses;
+      document.getElementById('statTotal').innerText = totalEvents;
+
+      // Actualizar lista de eventos
+      const eventListDiv = document.getElementById('eventList');
+      if (data.events && data.events.length) {
+        eventListDiv.innerHTML = data.events.map(ev => {
+          let cls = 'failure';
+          if (ev.event && ev.event.includes('SUCCESS')) cls = 'success';
+          else if (ev.event && (ev.event.includes('LIMIT') || ev.event.includes('LOCKOUT'))) cls = 'blocked';
+          else if (ev.event && ev.event.includes('INFO')) cls = 'info';
+          const timeStr = ev.timestamp ? ev.timestamp.slice(11,19) : '';
+          return `
+            <div class="event-item ${cls}">
+              <span class="event-type">${escapeHtml(ev.event)}</span>
+              <span class="event-user">${escapeHtml(ev.username)}</span>
+              <span class="event-ip">${escapeHtml(ev.ip)}</span>
+              <span class="event-time">${timeStr}</span>
+            </div>
+          `;
+        }).join('');
+      } else if (data.events && data.events.length === 0) {
+        eventListDiv.innerHTML = '<div style="color:var(--gray-500); padding:0.8rem; text-align:center;">Sin eventos recientes</div>';
+      }
+    } catch (err) {
+      // Fallo silencioso: mantiene la muestra actual
+      console.warn('Error refreshing dashboard data');
+    }
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  // Refrescar cada 3 segundos
+  refreshDashboard();
+  setInterval(refreshDashboard, 3000);
+</script>
+</body>
+</html>

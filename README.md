@@ -1,3 +1,8 @@
+## A07 - Authentication Failures
+Integrantes:
+- Julian Velandia
+- Juan Vargas
+
 ## SecureAuth - Pruebas de seguridad automatizadas (pytest)
 
 Este documento detalla la suite de pruebas desarrollada para validar los mecanismos de seguridad implementados en la aplicación de autenticación **SecureAuth**, alineada con OWASP A07:2025 (Authentication Failures). Las pruebas cubren aspectos críticos como rate limiting, bloqueo de cuentas, MFA (TOTP), hashing de contraseñas, anti-enumeración, protección contra session fixation y timeouts de sesión.

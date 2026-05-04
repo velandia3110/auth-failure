@@ -1,8 +1,9 @@
 ## A07 - Authentication Failures
+
 Integrantes:
+
 - Juan Vargas
 - Julian Velandia
-- Camilo Niño
 
 ## SecureAuth - Pruebas de seguridad automatizadas (pytest)
 
@@ -32,9 +33,9 @@ logger = logging.getLogger('test')
 
 ### Fixtures principales
 
-| Fixture | Propósito |
-|---------|-----------|
-| `client` | Proporciona un cliente de pruebas de Flask (test client) con configuración `TESTING=True`. |
+| Fixture                   | Propósito                                                                                                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `client`                | Proporciona un cliente de pruebas de Flask (test client) con configuración `TESTING=True`.                                                           |
 | `reset_state` (autouse) | Limpia el estado global (`ip_attempts`, `user_lockouts` y contadores de fallos de usuarios) **antes de cada prueba**, asegurando aislamiento. |
 
 ### Helper: `get_totp_code`
@@ -136,16 +137,16 @@ El archivo `test_results.log` contendrá el mismo detalle, siendo útil para dep
 
 ## Resumen de cobertura de seguridad
 
-| Mecanismo | Prueba implementada | CWE / OWASP |
-|-----------|---------------------|--------------|
-| Rate limiting por IP | `test_rate_limiting_ip` / `test_rate_limiting_window` | CWE-307 |
-| Bloqueo progresivo de cuenta | `test_account_lockout_progressive` | CWE-307 |
-| TOTP como segundo factor | `test_login_without_totp_fails` / `test_login_with_correct_totp_succeeds` | CWE-308 |
-| Hashing bcrypt | `test_passwords_are_hashed` | A04:2021 |
-| Anti-enumeración | `test_same_error_message` | CWE-287 |
-| Regeneración de sesión | `test_session_id_changes_after_login` | CWE-384 |
-| Timeout de sesión | `test_session_expires` | CWE-613 |
-| Sin secretos fijos | `test_secret_key_generated` | CWE-798 |
+| Mecanismo                    | Prueba implementada                                                           | CWE / OWASP |
+| ---------------------------- | ----------------------------------------------------------------------------- | ----------- |
+| Rate limiting por IP         | `test_rate_limiting_ip` / `test_rate_limiting_window`                     | CWE-307     |
+| Bloqueo progresivo de cuenta | `test_account_lockout_progressive`                                          | CWE-307     |
+| TOTP como segundo factor     | `test_login_without_totp_fails` / `test_login_with_correct_totp_succeeds` | CWE-308     |
+| Hashing bcrypt               | `test_passwords_are_hashed`                                                 | A04:2021    |
+| Anti-enumeración            | `test_same_error_message`                                                   | CWE-287     |
+| Regeneración de sesión     | `test_session_id_changes_after_login`                                       | CWE-384     |
+| Timeout de sesión           | `test_session_expires`                                                      | CWE-613     |
+| Sin secretos fijos           | `test_secret_key_generated`                                                 | CWE-798     |
 
 ## Notas adicionales
 
@@ -154,4 +155,3 @@ El archivo `test_results.log` contendrá el mismo detalle, siendo útil para dep
 - La función `get_totp_code` depende de que el endpoint `/api/demo_totp/<username>` esté activo; en un entorno real se usaría un secreto TOTP configurado por el usuario.
 
 Este conjunto de pruebas proporciona una base sólida para verificar que la aplicación cumple con las buenas prácticas de autenticación descritas en OWASP y mitiga los vectores de ataque más comunes.
-

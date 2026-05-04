@@ -1,7 +1,8 @@
 ## A07 - Authentication Failures
 Integrantes:
-- Julian Velandia
 - Juan Vargas
+- Julian Velandia
+- Camilo Niño
 
 ## SecureAuth - Pruebas de seguridad automatizadas (pytest)
 

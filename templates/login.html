@@ -452,7 +452,13 @@
 </head>
 <body>
 
-<div class="auth-container">
+{% if is_vulnerable %}
+<div style="background: #ff4d4d; color: white; text-align: center; padding: 10px; font-weight: bold; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+    ⚠️ MODO VULNERABLE ACTIVO - OWASP A07:2025 DEMO ⚠️
+</div>
+{% endif %}
+
+<div class="auth-container" {% if is_vulnerable %}style="margin-top: 40px; border: 2px solid #ff4d4d;"{% endif %}>
   <!-- panel lateral izquierdo: información de seguridad corporativa -->
   <div class="sidebar-panel">
     <div>
@@ -465,12 +471,38 @@
         </div>
         <div>
           <div class="brand-text">SecureAuth</div>
-          <div class="brand-badge">OWASP A07:2025 · Demo</div>
+          <div class="brand-badge">{% if is_vulnerable %}MODO VULNERABLE{% else %}OWASP A07:2025 · Demo{% endif %}</div>
         </div>
       </div>
     </div>
 
     <div class="security-features">
+      {% if is_vulnerable %}
+      <div class="feature-card" style="border-color: rgba(255, 77, 77, 0.3);">
+        <div class="feature-content">
+          <h4 style="color: #ff4d4d;">Sin Rate Limiting</h4>
+          <p>Intentos infinitos permitidos. Vulnerable a ataques de diccionario.</p>
+        </div>
+      </div>
+      <div class="feature-card" style="border-color: rgba(255, 77, 77, 0.3);">
+        <div class="feature-content">
+          <h4 style="color: #ff4d4d;">Sin MFA (2FA)</h4>
+          <p>Solo usuario y clave. Si la clave se filtra, la cuenta está perdida.</p>
+        </div>
+      </div>
+      <div class="feature-card" style="border-color: rgba(255, 77, 77, 0.3);">
+        <div class="feature-content">
+          <h4 style="color: #ff4d4d;">Texto Plano / MD5</h4>
+          <p>Contraseñas guardadas sin hashing fuerte. Fáciles de crackear.</p>
+        </div>
+      </div>
+      <div class="feature-card" style="border-color: rgba(255, 77, 77, 0.3);">
+        <div class="feature-content">
+          <h4 style="color: #ff4d4d;">Enumeración Activa</h4>
+          <p>Los mensajes de error revelan si el usuario existe o no.</p>
+        </div>
+      </div>
+      {% else %}
       <div class="feature-card">
         <div class="feature-content">
           <h4>Rate limiting + Lockout</h4>
@@ -501,6 +533,7 @@
           <p>ID regenerado tras login · expiración automática.</p>
         </div>
       </div>
+      {% endif %}
     </div>
 
     <div>
@@ -517,10 +550,10 @@
   </div>
 
   <!-- panel formulario de autenticación -->
-  <div class="form-panel">
+    <div class="form-panel">
     <div class="form-header">
-      <h2>Inicio de sesión</h2>
-      <p>Acceso seguro · cumplimiento OWASP Top 10:2025</p>
+      <h2>{% if is_vulnerable %}Login Inseguro{% else %}Inicio de sesión{% endif %}</h2>
+      <p>{% if is_vulnerable %}Vulnerable a OWASP A07{% else %}Acceso seguro · cumplimiento OWASP Top 10:2025{% endif %}</p>
     </div>
 
     <!-- Mensajes dinámicos (Jinja2) -->
@@ -561,6 +594,7 @@
                  maxlength="128" required>
         </div>
 
+        {% if not is_vulnerable %}
         <div class="input-group">
           <label for="totp">Código TOTP (Autenticador MFA)</label>
           <div class="totp-flex">
@@ -574,6 +608,7 @@
             <a href="#" id="fetchTotp" class="link-ghost">Obtener código TOTP demo automático</a>
           </div>
         </div>
+        {% endif %}
 
         <button type="submit" class="btn-primary">Verificar credenciales</button>
       </div>
@@ -601,10 +636,15 @@
       </div>
       <hr>
       <div class="small-hint" style="margin-top: 8px; text-align: left;">
+        {% if is_vulnerable %}
+        No se requiere MFA en este modo. Solo usa usuario y clave.
+        {% else %}
         MFA obligatorio: el TOTP se obtendrá automáticamente al usar demo.
+        {% endif %}
       </div>
     </div>
 
+    {% if not is_vulnerable %}
     <!-- tiny barra de intentos (visual feedback) opcional, se puede conectar con backend pero es estática demostrativa -->
     <div class="attempt-track">
       <div class="attempt-progress" id="attemptProgressBar" style="width: 0%;"></div>
@@ -612,6 +652,7 @@
     <div class="small-hint" style="margin-top: -0.2rem; text-align: right;">
       Intentos fallidos: <span id="attemptCountSpan">0</span> / 5
     </div>
+    {% endif %}
   </div>
 </div>
 

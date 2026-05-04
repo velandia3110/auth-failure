@@ -391,12 +391,16 @@
     }
   </style>
 </head>
-<body>
+{% if is_vulnerable %}
+<div style="background: #ff4d4d; color: white; text-align: center; padding: 10px; font-weight: bold; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+    ⚠️ MODO VULNERABLE ACTIVO - OWASP A07:2025 DEMO ⚠️
+</div>
+{% endif %}
 
-<div class="topbar">
+<div class="topbar" {% if is_vulnerable %}style="margin-top: 40px; border-bottom: 2px solid #ff4d4d;"{% endif %}>
   <div class="brand">
     Secure<span style="font-weight: 400;">Auth</span>
-    <small>OWASP A07:2025 · Dashboard</small>
+    <small>{% if is_vulnerable %}VULNERABLE MODE{% else %}OWASP A07:2025 · Dashboard{% endif %}</small>
   </div>
   <div class="user-info">
     <span class="user-badge">{{ username | default('admin') }}</span>
@@ -411,8 +415,8 @@
   <div class="success-banner">
     <div class="banner-icon">✓</div>
     <div>
-      <div class="banner-title">Autenticación exitosa</div>
-      <div class="banner-sub">MFA verificado · Sesión regenerada · Último acceso: {{ last_login or 'primera vez' }}</div>
+      <div class="banner-title">Autenticación exitosa {% if is_vulnerable %}(MODO INSEGURO){% endif %}</div>
+      <div class="banner-sub">{% if is_vulnerable %}Sin MFA · Sin Rate Limiting · Sin Seguridad{% else %}MFA verificado · Sesión regenerada · Último acceso: {{ last_login or 'primera vez' }}{% endif %}</div>
     </div>
   </div>
 
@@ -464,41 +468,41 @@
     <div class="panel">
       <div class="section-title" style="margin-bottom: 1rem;">Controles de seguridad activos</div>
       <div class="owasp-grid">
-        <div class="owasp-item">
+        <div class="owasp-item" {% if is_vulnerable %}style="border-color: #ff4d4d;"{% endif %}>
           <div class="owasp-name">Rate limiting</div>
           <div class="owasp-cwe">CWE-307 · 10 req/min/IP</div>
-          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
-          <div class="owasp-status">Activo</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:{% if is_vulnerable %}0%{% else %}100%{% endif %}; background: {% if is_vulnerable %}#ff4d4d{% else %}var(--gray-800){% endif %};"></div></div>
+          <div class="owasp-status">{% if is_vulnerable %}Inactivo{% else %}Activo{% endif %}</div>
         </div>
-        <div class="owasp-item">
+        <div class="owasp-item" {% if is_vulnerable %}style="border-color: #ff4d4d;"{% endif %}>
           <div class="owasp-name">TOTP (MFA)</div>
           <div class="owasp-cwe">CWE-308 · RFC 6238</div>
-          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
-          <div class="owasp-status">Activo</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:{% if is_vulnerable %}0%{% else %}100%{% endif %}; background: {% if is_vulnerable %}#ff4d4d{% else %}var(--gray-800){% endif %};"></div></div>
+          <div class="owasp-status">{% if is_vulnerable %}Inactivo{% else %}Activo{% endif %}</div>
         </div>
-        <div class="owasp-item">
+        <div class="owasp-item" {% if is_vulnerable %}style="border-color: #ff4d4d;"{% endif %}>
           <div class="owasp-name">bcrypt hashing</div>
           <div class="owasp-cwe">A04 · rounds=12</div>
-          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
-          <div class="owasp-status">Activo</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:{% if is_vulnerable %}10%{% else %}100%{% endif %}; background: {% if is_vulnerable %}#ff4d4d{% else %}var(--gray-800){% endif %};"></div></div>
+          <div class="owasp-status">{% if is_vulnerable %}Débil (MD5/Plain){% else %}Activo{% endif %}</div>
         </div>
-        <div class="owasp-item">
+        <div class="owasp-item" {% if is_vulnerable %}style="border-color: #ff4d4d;"{% endif %}>
           <div class="owasp-name">Anti-enumeración</div>
           <div class="owasp-cwe">CWE-287 · msg genérico</div>
-          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
-          <div class="owasp-status">Activo</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:{% if is_vulnerable %}0%{% else %}100%{% endif %}; background: {% if is_vulnerable %}#ff4d4d{% else %}var(--gray-800){% endif %};"></div></div>
+          <div class="owasp-status">{% if is_vulnerable %}Inactivo{% else %}Activo{% endif %}</div>
         </div>
-        <div class="owasp-item">
+        <div class="owasp-item" {% if is_vulnerable %}style="border-color: #ff4d4d;"{% endif %}>
           <div class="owasp-name">Session Fixation</div>
           <div class="owasp-cwe">CWE-384 · regeneración</div>
-          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
-          <div class="owasp-status">Activo</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:{% if is_vulnerable %}0%{% else %}100%{% endif %}; background: {% if is_vulnerable %}#ff4d4d{% else %}var(--gray-800){% endif %};"></div></div>
+          <div class="owasp-status">{% if is_vulnerable %}Inactivo{% else %}Activo{% endif %}</div>
         </div>
-        <div class="owasp-item">
+        <div class="owasp-item" {% if is_vulnerable %}style="border-color: #ff4d4d;"{% endif %}>
           <div class="owasp-name">Session Timeout</div>
           <div class="owasp-cwe">CWE-613 · 15 min idle</div>
-          <div class="owasp-bar"><div class="owasp-fill" style="width:100%"></div></div>
-          <div class="owasp-status">Activo</div>
+          <div class="owasp-bar"><div class="owasp-fill" style="width:{% if is_vulnerable %}0%{% else %}100%{% endif %}; background: {% if is_vulnerable %}#ff4d4d{% else %}var(--gray-800){% endif %};"></div></div>
+          <div class="owasp-status">{% if is_vulnerable %}Inactivo{% else %}Activo{% endif %}</div>
         </div>
       </div>
     </div>
